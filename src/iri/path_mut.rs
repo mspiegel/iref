@@ -1,5 +1,7 @@
+use alloc::vec::Vec;
+
 use crate::common::path_mut::PathMutImpl;
-use std::ops::Deref;
+use core::ops::Deref;
 
 use super::{path::Segment, Path, PathBuf};
 

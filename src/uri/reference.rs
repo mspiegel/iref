@@ -1,4 +1,9 @@
-use std::hash::{self, Hash};
+use alloc::borrow::ToOwned;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+use core::hash::{self, Hash};
 
 use static_regular_grammar::RegularGrammar;
 
@@ -82,7 +87,7 @@ impl UriRef {
 	#[inline]
 	pub fn as_iri(&self) -> Option<&Iri> {
 		if self.scheme().is_some() {
-			Some(unsafe { Iri::new_unchecked(std::str::from_utf8_unchecked(&self.0)) })
+			Some(unsafe { Iri::new_unchecked(core::str::from_utf8_unchecked(&self.0)) })
 		} else {
 			None
 		}
@@ -90,7 +95,7 @@ impl UriRef {
 
 	#[inline]
 	pub fn as_iri_ref(&self) -> &IriRef {
-		unsafe { IriRef::new_unchecked(std::str::from_utf8_unchecked(&self.0)) }
+		unsafe { IriRef::new_unchecked(core::str::from_utf8_unchecked(&self.0)) }
 	}
 
 	/// Returns the scheme of the URI reference, if any.
@@ -245,43 +250,43 @@ impl PartialEq<UriBuf> for UriRef {
 impl Eq for UriRef {}
 
 impl PartialOrd for UriRef {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
 impl<'a> PartialOrd<&'a UriRef> for UriRef {
-	fn partial_cmp(&self, other: &&'a Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Self) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<UriRefBuf> for UriRef {
-	fn partial_cmp(&self, other: &UriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriRefBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl PartialOrd<Uri> for UriRef {
-	fn partial_cmp(&self, other: &Uri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Uri) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl<'a> PartialOrd<&'a Uri> for UriRef {
-	fn partial_cmp(&self, other: &&'a Uri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Uri) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl PartialOrd<UriBuf> for UriRef {
-	fn partial_cmp(&self, other: &UriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl Ord for UriRef {
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
 		self.parts().cmp(&other.parts())
 	}
 }
@@ -540,19 +545,19 @@ impl PartialEq<UriBuf> for UriRefBuf {
 }
 
 impl PartialOrd<Uri> for UriRefBuf {
-	fn partial_cmp(&self, other: &Uri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Uri) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl<'a> PartialOrd<&'a Uri> for UriRefBuf {
-	fn partial_cmp(&self, other: &&'a Uri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Uri) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl PartialOrd<UriBuf> for UriRefBuf {
-	fn partial_cmp(&self, other: &UriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriBuf) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other.as_uri_ref())
 	}
 }

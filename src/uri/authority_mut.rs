@@ -1,4 +1,6 @@
-use std::ops::Deref;
+use alloc::vec::Vec;
+
+use core::ops::Deref;
 
 use crate::common::authority_mut::AuthorityMutImpl;
 

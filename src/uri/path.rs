@@ -1,3 +1,7 @@
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
 use static_regular_grammar::RegularGrammar;
 
 mod segment;
@@ -196,7 +200,7 @@ impl Path {
 	///
 	/// # Example
 	/// ```
-	/// # use std::convert::TryFrom;
+	/// # use core::convert::TryFrom;
 	/// use iref::iri::{Path, PathBuf};
 	///
 	/// let prefix = Path::new("/foo/bar").unwrap();
@@ -281,15 +285,15 @@ impl Eq for Path {}
 
 impl PartialOrd for Path {
 	#[inline]
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
 impl Ord for Path {
 	#[inline]
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-		use std::cmp::Ordering;
+	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+		use core::cmp::Ordering;
 		if self.is_absolute() == other.is_absolute() {
 			let mut self_segments = self.normalized_segments();
 			let mut other_segments = other.normalized_segments();
@@ -314,9 +318,9 @@ impl Ord for Path {
 	}
 }
 
-impl std::hash::Hash for Path {
+impl core::hash::Hash for Path {
 	#[inline]
-	fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
+	fn hash<H: core::hash::Hasher>(&self, hasher: &mut H) {
 		self.is_absolute().hash(hasher);
 		self.normalized_segments().for_each(move |s| s.hash(hasher))
 	}

@@ -1,4 +1,9 @@
-use std::hash::{self, Hash};
+use alloc::borrow::ToOwned;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+use core::hash::{self, Hash};
 
 use static_regular_grammar::RegularGrammar;
 
@@ -169,7 +174,7 @@ impl IriRef {
 	/// ```
 	#[inline]
 	pub fn base(&self) -> &Self {
-		unsafe { Self::new_unchecked(std::str::from_utf8_unchecked(RiRefImpl::base(self))) }
+		unsafe { Self::new_unchecked(core::str::from_utf8_unchecked(RiRefImpl::base(self))) }
 	}
 }
 
@@ -238,43 +243,43 @@ impl PartialEq<IriBuf> for IriRef {
 impl Eq for IriRef {}
 
 impl PartialOrd for IriRef {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
 impl<'a> PartialOrd<&'a IriRef> for IriRef {
-	fn partial_cmp(&self, other: &&'a Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Self) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<IriRefBuf> for IriRef {
-	fn partial_cmp(&self, other: &IriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriRefBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl PartialOrd<Iri> for IriRef {
-	fn partial_cmp(&self, other: &Iri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Iri) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl<'a> PartialOrd<&'a Iri> for IriRef {
-	fn partial_cmp(&self, other: &&'a Iri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Iri) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl PartialOrd<IriBuf> for IriRef {
-	fn partial_cmp(&self, other: &IriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl Ord for IriRef {
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
 		self.parts().cmp(&other.parts())
 	}
 }
@@ -553,19 +558,19 @@ impl PartialEq<IriBuf> for IriRefBuf {
 }
 
 impl PartialOrd<Iri> for IriRefBuf {
-	fn partial_cmp(&self, other: &Iri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Iri) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl<'a> PartialOrd<&'a Iri> for IriRefBuf {
-	fn partial_cmp(&self, other: &&'a Iri) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Iri) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl PartialOrd<IriBuf> for IriRefBuf {
-	fn partial_cmp(&self, other: &IriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriBuf) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other.as_iri_ref())
 	}
 }

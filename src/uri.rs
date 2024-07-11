@@ -1,6 +1,11 @@
+use alloc::borrow::Cow;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
 use static_regular_grammar::RegularGrammar;
-use std::{
-	borrow::{Borrow, Cow},
+use core::{
+	borrow::Borrow,
 	hash::{self, Hash},
 };
 
@@ -27,7 +32,8 @@ use crate::{
 	Iri, IriBuf, IriRef, IriRefBuf,
 };
 
-macro_rules! uri_error {
+#[cfg(feature="std")]
+macro_rules! uri_error_top {
 	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
 		#[derive(Debug, thiserror::Error)]
 		pub enum UriError<T> {
@@ -36,7 +42,23 @@ macro_rules! uri_error {
 				$variant(#[from] $ident<T>)
 			),*
 		}
+	};
+}
 
+#[cfg(not(feature="std"))]
+macro_rules! uri_error_top {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
+		#[derive(Debug)]
+		pub enum UriError<T> {
+			$(
+				$variant($ident<T>)
+			),*
+		}
+	};
+}
+
+macro_rules! uri_error_bottom {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
 		$(
 			impl<'a> From<$ident<String>> for UriError<Cow<'a, str>> {
 				fn from($ident(value): $ident<String>) -> Self {
@@ -62,6 +84,13 @@ macro_rules! uri_error {
 				}
 			}
 		)*
+	};
+}
+
+macro_rules! uri_error {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
+		uri_error_top!($($(#[$meta])* $variant: $ident),*);
+		uri_error_bottom!($($(#[$meta])* $variant: $ident),*);
 	};
 }
 
@@ -165,11 +194,11 @@ impl Uri {
 	}
 
 	pub fn as_iri(&self) -> &Iri {
-		unsafe { Iri::new_unchecked(std::str::from_utf8_unchecked(&self.0)) }
+		unsafe { Iri::new_unchecked(core::str::from_utf8_unchecked(&self.0)) }
 	}
 
 	pub fn as_iri_ref(&self) -> &IriRef {
-		unsafe { IriRef::new_unchecked(std::str::from_utf8_unchecked(&self.0)) }
+		unsafe { IriRef::new_unchecked(core::str::from_utf8_unchecked(&self.0)) }
 	}
 
 	/// Returns the scheme of the URI.
@@ -322,43 +351,43 @@ impl PartialEq<UriRefBuf> for Uri {
 impl Eq for Uri {}
 
 impl PartialOrd for Uri {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
 impl<'a> PartialOrd<&'a Uri> for Uri {
-	fn partial_cmp(&self, other: &&'a Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Self) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<UriBuf> for Uri {
-	fn partial_cmp(&self, other: &UriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri())
 	}
 }
 
 impl PartialOrd<UriRef> for Uri {
-	fn partial_cmp(&self, other: &UriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriRef) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other)
 	}
 }
 
 impl<'a> PartialOrd<&'a UriRef> for Uri {
-	fn partial_cmp(&self, other: &&'a UriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a UriRef) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<UriRefBuf> for Uri {
-	fn partial_cmp(&self, other: &UriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriRefBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_uri_ref())
 	}
 }
 
 impl Ord for Uri {
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
 		self.parts().cmp(&other.parts())
 	}
 }
@@ -599,19 +628,19 @@ impl PartialEq<UriRefBuf> for UriBuf {
 }
 
 impl PartialOrd<UriRef> for UriBuf {
-	fn partial_cmp(&self, other: &UriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriRef) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other)
 	}
 }
 
 impl<'a> PartialOrd<&'a UriRef> for UriBuf {
-	fn partial_cmp(&self, other: &&'a UriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a UriRef) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<UriRefBuf> for UriBuf {
-	fn partial_cmp(&self, other: &UriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &UriRefBuf) -> Option<core::cmp::Ordering> {
 		self.as_uri_ref().partial_cmp(other.as_uri_ref())
 	}
 }

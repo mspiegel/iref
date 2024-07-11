@@ -204,6 +204,14 @@
 //! Thanks to the [`pct-str` crate](https://crates.io/crates/pct-str),
 //! percent encoded characters are correctly handled.
 //! The two IRIs `http://example.org` and `http://exa%6dple.org` **are** equivalent.
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(test)]
+#[macro_use]
+extern crate std;
+
+extern crate alloc;
+
 pub(crate) mod common;
 pub mod iri;
 pub mod uri;

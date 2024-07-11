@@ -1,4 +1,5 @@
-use std::{marker::PhantomData, ops::Range};
+use alloc::vec::Vec;
+use core::{marker::PhantomData, ops::Range};
 
 use super::{
 	authority::{AuthorityImpl, HostImpl, UserInofImpl},

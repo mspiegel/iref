@@ -1,4 +1,6 @@
-use std::ops::Range;
+use alloc::borrow::ToOwned;
+use alloc::vec::Vec;
+use core::ops::Range;
 
 use super::{
 	parse, AuthorityImpl, AuthorityMutImpl, FragmentImpl, PathImpl, PathMutImpl, QueryImpl,

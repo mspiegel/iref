@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use pct_str::PctStr;
 use smallvec::SmallVec;
 
@@ -332,7 +333,7 @@ pub trait PathImpl: 'static {
 	///
 	/// # Example
 	/// ```
-	/// # use std::convert::TryFrom;
+	/// # use core::convert::TryFrom;
 	/// use iref::iri::{Path, PathBuf};
 	///
 	/// let prefix = Path::new("/foo/bar").unwrap();

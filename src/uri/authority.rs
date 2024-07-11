@@ -1,4 +1,8 @@
-use std::{
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+use core::{
 	cmp,
 	hash::{self, Hash},
 };

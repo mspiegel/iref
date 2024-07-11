@@ -56,8 +56,8 @@ macro_rules! str_eq {
 			}
 		}
 
-		impl PartialEq<String> for $ident {
-			fn eq(&self, other: &String) -> bool {
+		impl PartialEq<alloc::string::String> for $ident {
+			fn eq(&self, other: &alloc::string::String) -> bool {
 				self.as_str() == other.as_str()
 			}
 		}
@@ -105,7 +105,7 @@ macro_rules! bytestr_eq {
 		}
 
 		impl PartialEq<String> for $ident {
-			fn eq(&self, other: &String) -> bool {
+			fn eq(&self, other: &alloc::string::String) -> bool {
 				self.as_str() == other.as_str()
 			}
 		}

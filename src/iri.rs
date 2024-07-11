@@ -1,5 +1,10 @@
-use std::{
-	borrow::{Borrow, Cow},
+use alloc::borrow::Cow;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+use core::{
+	borrow::Borrow,
 	hash::{self, Hash},
 };
 
@@ -27,7 +32,8 @@ use crate::{
 	InvalidUri, Uri, UriBuf, UriRef, UriRefBuf,
 };
 
-macro_rules! iri_error {
+#[cfg(feature="std")]
+macro_rules! iri_error_top {
 	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
 		#[derive(Debug, thiserror::Error)]
 		pub enum IriError<T> {
@@ -36,7 +42,23 @@ macro_rules! iri_error {
 				$variant(#[from] $ident<T>)
 			),*
 		}
+	};
+}
 
+#[cfg(not(feature="std"))]
+macro_rules! iri_error_top {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
+		#[derive(Debug)]
+		pub enum IriError<T> {
+			$(
+				$variant($ident<T>)
+			),*
+		}
+	};
+}
+
+macro_rules! iri_error_bottom {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
 		$(
 			impl<'a> From<$ident<String>> for IriError<Cow<'a, str>> {
 				fn from($ident(value): $ident<String>) -> Self {
@@ -62,6 +84,13 @@ macro_rules! iri_error {
 				}
 			}
 		)*
+	};
+}
+
+macro_rules! iri_error {
+	($($(#[$meta:meta])* $variant:ident : $ident:ident),*) => {
+		iri_error_top!($($(#[$meta])* $variant: $ident),*);
+		iri_error_bottom!($($(#[$meta])* $variant: $ident),*);
 	};
 }
 
@@ -259,7 +288,7 @@ impl Iri {
 	/// ```
 	#[inline]
 	pub fn base(&self) -> &Self {
-		unsafe { Self::new_unchecked(std::str::from_utf8_unchecked(RiRefImpl::base(self))) }
+		unsafe { Self::new_unchecked(core::str::from_utf8_unchecked(RiRefImpl::base(self))) }
 	}
 }
 
@@ -338,43 +367,43 @@ impl PartialEq<IriRefBuf> for Iri {
 impl Eq for Iri {}
 
 impl PartialOrd for Iri {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
 impl<'a> PartialOrd<&'a Iri> for Iri {
-	fn partial_cmp(&self, other: &&'a Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a Self) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<IriBuf> for Iri {
-	fn partial_cmp(&self, other: &IriBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri())
 	}
 }
 
 impl PartialOrd<IriRef> for Iri {
-	fn partial_cmp(&self, other: &IriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriRef) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other)
 	}
 }
 
 impl<'a> PartialOrd<&'a IriRef> for Iri {
-	fn partial_cmp(&self, other: &&'a IriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a IriRef) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<IriRefBuf> for Iri {
-	fn partial_cmp(&self, other: &IriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriRefBuf) -> Option<core::cmp::Ordering> {
 		self.partial_cmp(other.as_iri_ref())
 	}
 }
 
 impl Ord for Iri {
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
 		self.parts().cmp(&other.parts())
 	}
 }
@@ -624,19 +653,19 @@ impl PartialEq<IriRefBuf> for IriBuf {
 }
 
 impl PartialOrd<IriRef> for IriBuf {
-	fn partial_cmp(&self, other: &IriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriRef) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other)
 	}
 }
 
 impl<'a> PartialOrd<&'a IriRef> for IriBuf {
-	fn partial_cmp(&self, other: &&'a IriRef) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &&'a IriRef) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(*other)
 	}
 }
 
 impl PartialOrd<IriRefBuf> for IriBuf {
-	fn partial_cmp(&self, other: &IriRefBuf) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &IriRefBuf) -> Option<core::cmp::Ordering> {
 		self.as_iri_ref().partial_cmp(other.as_iri_ref())
 	}
 }
